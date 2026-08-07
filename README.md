@@ -88,3 +88,8 @@ content/
   90-main.js         injection, observer, init, popup commands
   styles.css         injected CSS (incl. privacy blur)
 ```
+
+## (!) Important Note & Disclaimer
+This extension is intended strictly for personal use and small daily tasks. Using this tool for aggressive messaging, spam, or in any way that violates WhatsApp's Terms of Service may result in your account being banned. Use at your own risk.
+
+WhatsApp is a trademark of WhatsApp Inc., registered in the U.S. and other countries. This extension is an independent project and is not affiliated with, authorised, maintained, sponsored, or endorsed by WhatsApp Inc. or Meta Platforms, Inc.
