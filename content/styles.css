@@ -1,1 +1,231 @@
+/* WhatsApp Web Advanced — injected styles */
 
+:root {
+  --wap-green: #1daa61;
+  --wap-green-dark: #21c063;
+}
+
+/* ----------------------------- Injected buttons --------------------------- */
+.wap-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 40px;
+  height: 40px;
+  margin: 0 2px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #0a0a0a;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.wap-btn:hover { background: rgba(0, 0, 0, 0.06); }
+.wap-btn .wap-btn__label { font-size: 12px; }
+.wap-btn--active { color: var(--wap-green); background: rgba(0, 168, 132, 0.12); }
+
+/* Dark theme awareness (WhatsApp toggles a dark body) */
+body.dark .wap-btn,
+.dark .wap-btn { color: #fafafa; }
+body.dark .wap-btn:hover,
+.dark .wap-btn:hover { background: rgba(255, 255, 255, 0.08); }
+
+/* -------------------------------- Modals ---------------------------------- */
+.wap-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483600;
+  background: rgba(11, 20, 26, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+}
+.wap-modal {
+  width: 92%;
+  background: #fff;
+  color: #111b21;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+}
+.dark .wap-modal, body.dark .wap-modal { background: #1d1f1f; color: #fafafa; }
+
+.wap-modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: var(--wap-green);
+  color: #fff;
+}
+.wap-modal__title { margin: 0; font-size: 17px; font-weight: 600; }
+.wap-modal__close {
+  background: transparent; border: none; color: #fff;
+  font-size: 26px; line-height: 1; cursor: pointer; padding: 0 4px;
+}
+.wap-modal__body { padding: 18px; overflow-y: auto; }
+
+.wap-field { display: block; margin-bottom: 14px; }
+.wap-field > span { display: block; font-size: 13px; margin-bottom: 5px; color: #667781; }
+.dark .wap-field > span, body.dark .wap-field > span { color: #8696a0; }
+.wap-field input,
+.wap-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 11px;
+  border: 1px solid #d1d7db;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #fff;
+  color: #111b21;
+  font-family: inherit;
+}
+.dark .wap-field input, .dark .wap-field textarea,
+body.dark .wap-field input, body.dark .wap-field textarea {
+  background: #2d2e2e; border-color: #374248; color: #e9edef;
+}
+.wap-field input:focus, .wap-field textarea:focus {
+  outline: none; border-color: var(--wap-green);
+}
+.wap-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.wap-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; }
+.wap-primary {
+  background: var(--wap-green);
+  color: #fff; border: none; border-radius: 22px;
+  padding: 9px 22px; font-size: 14px; font-weight: 600; cursor: pointer;
+}
+.wap-primary:hover { background: var(--wap-green-dark); }
+.wap-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.wap-link {
+  background: none; border: none; color: var(--wap-green);
+  cursor: pointer; font-size: 13px; padding: 4px 6px;
+}
+.wap-link:hover { text-decoration: underline; }
+
+.wap-hint { font-size: 12px; color: #8696a0; margin: 10px 0 0; line-height: 1.45; }
+.wap-hint code {
+  background: rgba(0,0,0,0.06); padding: 1px 4px; border-radius: 4px; font-size: 11px;
+}
+.dark .wap-hint code, body.dark .wap-hint code { background: rgba(255,255,255,0.1); }
+
+.wap-hidden { display: none !important; }
+
+/* Tabs */
+.wap-tabs { display: flex; gap: 6px; border-bottom: 1px solid #e0e0e0; margin-bottom: 16px; }
+.dark .wap-tabs, body.dark .wap-tabs { border-color: #2d2e2e; }
+.wap-tab {
+  background: none; border: none; padding: 8px 12px; cursor: pointer;
+  font-size: 14px; color: #667781; border-bottom: 2px solid transparent;
+}
+.wap-tab--active { color: var(--wap-green); border-bottom-color: var(--wap-green); font-weight: 600; }
+
+/* Lists */
+.wap-list__item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 4px; border-bottom: 1px solid #eee; gap: 10px;
+}
+.dark .wap-list__item, body.dark .wap-list__item { border-color: #2d2e2e; }
+.wap-list__title { font-weight: 600; font-size: 14px; }
+.wap-list__sub { font-size: 12px; color: #8696a0; }
+.wap-list__time { font-size: 12px; color: var(--wap-green); margin-top: 2px; }
+.wap-empty, .wap-preview { font-size: 13px; color: #667781; }
+.wap-preview ul { margin: 6px 0; padding-inline-start: 18px; }
+.wap-preview li { font-size: 12px; margin: 2px 0; }
+
+/* ------------------------------ Bulk widget ------------------------------- */
+.wap-bulk-widget {
+  position: fixed; right: 16px; bottom: 16px; z-index: 2147483500;
+  width: 240px; padding: 12px 14px; border-radius: 10px;
+  background: #fff; color: #111b21; box-shadow: 0 6px 24px rgba(0,0,0,0.25);
+  font-family: "Segoe UI", Helvetica, Arial, sans-serif; font-size: 13px;
+}
+.dark .wap-bulk-widget, body.dark .wap-bulk-widget { background: #1d1f1f; color: #fafafa; }
+.wap-bulk-widget__row { display: flex; justify-content: space-between; align-items: center; }
+.wap-bulk-widget__progress { margin: 6px 0; color: #8696a0; }
+.wap-bulk-widget__bar { height: 6px; background: #e0e0e0; border-radius: 4px; overflow: hidden; }
+.dark .wap-bulk-widget__bar, body.dark .wap-bulk-widget__bar { background: #2d2e2e; }
+#wap-bulk-bar { height: 100%; width: 0; background: var(--wap-green); transition: width 0.3s ease; }
+
+/* -------------------------------- Toasts ---------------------------------- */
+#wap-toast-host {
+  position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+  z-index: 2147483647; display: flex; flex-direction: column; gap: 8px; align-items: center;
+}
+.wap-toast {
+  background: #111b21; color: #fff; padding: 10px 18px; border-radius: 22px;
+  font-size: 13px; box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  opacity: 0; transform: translateY(-8px); transition: opacity 0.2s, transform 0.2s;
+  max-width: 80vw; text-align: center;
+  font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+}
+.wap-toast--show { opacity: 1; transform: translateY(0); }
+.wap-toast--error { background: #c0392b; }
+
+/* ----------------------------- Privacy blur ------------------------------- */
+html.wap-privacy-on #pane-side div[role="listitem"],
+html.wap-privacy-on #pane-side [role="row"] {
+  filter: blur(7px);
+  transition: filter 0.8s ease;
+}
+html.wap-privacy-on #pane-side div[role="listitem"]:hover,
+html.wap-privacy-on #pane-side [role="row"]:hover {
+  filter: none;
+  transition: filter 0.8s ease;
+}
+
+html.wap-privacy-on #main div.message-in,
+html.wap-privacy-on #main div.message-out,
+html.wap-privacy-on #main [data-id] .copyable-text,
+html.wap-privacy-on #main [data-testid="document-thumb"],
+html.wap-privacy-on #main [data-testid="subtype-invite"] {
+  filter: blur(7px);
+  transition: filter 0.8s ease;
+}
+html.wap-privacy-on #main img,
+html.wap-privacy-on #main [data-testid="sticker-container"] {
+  filter: blur(70px);
+  transition: filter 0.8s ease;
+}
+html.wap-privacy-on #main div.message-in:hover,
+html.wap-privacy-on #main div.message-out:hover,
+html.wap-privacy-on #main [data-id]:hover .copyable-text,
+html.wap-privacy-on #main [data-testid="document-thumb"]:hover,
+html.wap-privacy-on #main [data-testid="subtype-invite"]:hover,
+html.wap-privacy-on #main [data-testid="sticker-container"]:hover,
+html.wap-privacy-on #main img:hover  {
+  filter: none;
+  transition: filter 0.8s ease;
+}
+
+html.wap-privacy-on #main header span[dir="auto"],
+html.wap-privacy-on #main footer [data-testid="compose-box"],
+html.wap-privacy-on #main [data-testid="selectable-text"],
+html.wap-privacy-on #main [data-testid="default-group-refreshed"],
+html.wap-privacy-on #main [data-testid="author"] {
+  filter: blur(6px);
+  transition: filter 0.8s ease;
+}
+html.wap-privacy-on #main header:hover span[dir="auto"],
+html.wap-privacy-on #main footer [data-testid="compose-box"]:hover,
+html.wap-privacy-on #main [data-testid="selectable-text"]:hover,
+html.wap-privacy-on #main [data-testid="default-group-refreshed"]:hover,
+html.wap-privacy-on #main [data-testid="author"]:hover {
+  filter: none;
+  transition: filter 0.8s ease;
+}
+
+html.wap-privacy-on .wap-modal-overlay,
+html.wap-privacy-on .wap-bulk-widget,
+html.wap-privacy-on #wap-toast-host,
+html.wap-privacy-on .wap-btn {
+  filter: none !important;
+}
