@@ -1,1 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    body {
+      width: 280px;
+      margin: 0;
+      font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+      color: #fafafa;
+      background: #1d1f1f;
+    }
+    header {
+      background: #21c063;
+      color: #1d1f1f;
+      padding: 12px 14px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .body { padding: 12px 14px; }
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .row:last-child { border-bottom: none; }
+    .row span { font-size: 14px; }
+    button {
+      background: #21c063;
+      color: #1d1f1f;
+      border: none;
+      border-radius: 16px;
+      padding: 6px 14px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    button:hover { background: #37c672; }
+    button.toggle.off { background: #8696a0; }
 
+    .warn {
+      font-size: 11px;
+      color: #c0392b;
+      padding: 8px 14px 0;
+    }
+  </style>
+</head>
+<body>
+  <header>WhatsApp Web Advanced</header>
+  <div class="body">
+    <div class="row"><span>Schedule a message</span><button data-feature="schedule">Open</button></div>
+    <div class="row"><span>Bulk sender (CSV)</span><button data-feature="bulk">Open</button></div>
+    <div class="row"><span>Message without saving</span><button data-feature="nosave">Open</button></div>
+    <div class="row"><span>Privacy blur mode</span><button class="toggle off" id="privacy-toggle">Off</button></div>
+  </div>
+  <div class="warn" id="warn" style="display:none">Open web.whatsapp.com in a tab first.</div>
+  <script src="popup.js"></script>
+</body>
+</html>
