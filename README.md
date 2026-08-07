@@ -11,10 +11,11 @@ A toolbar popup mirrors all four controls as a backup.
 
 ## Install (temporary, for testing)
 
-1. Open Firefox and go to `about:debugging#/runtime/this-firefox`.
-2. Click **Load Temporary Add‑on…**.
-3. Select the `manifest.json` file in this folder.
-4. Open https://web.whatsapp.com/ and reload it.
+1. Download this repository as ZIP file.
+2. Open Firefox and go to `about:debugging#/runtime/this-firefox`.
+3. Click **Load Temporary Add‑on…**.
+4. Select the downloaded ZIP file.
+5. Open https://web.whatsapp.com/ and reload it.
 
 Temporary add‑ons are removed when Firefox restarts. To keep it permanently you
 must sign/publish it on addons.mozilla.org (or use Firefox Developer/Nightly with
