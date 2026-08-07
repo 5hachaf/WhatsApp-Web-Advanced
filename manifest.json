@@ -1,0 +1,49 @@
+{
+  "manifest_version": 2,
+  "name": "WhatsApp Web Advanced",
+  "version": "1.5.0",
+  "description": "Adds message scheduling, a CSV bulk sender, send-without-saving, and a privacy blur mode to WhatsApp Web.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "whatsapp-web-advanced@5hachaf",
+      "strict_min_version": "109.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  },
+  "icons": {
+    "48": "icons/icon.svg",
+    "96": "icons/icon.svg"
+  },
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://web.whatsapp.com/*"],
+      "css": ["content/styles.css"],
+      "js": [
+        "content/00-utils.js",
+        "content/10-selectors.js",
+        "content/20-messaging.js",
+        "content/30-ui.js",
+        "content/40-schedule.js",
+        "content/50-bulk.js",
+        "content/60-nosave.js",
+        "content/70-privacy.js",
+        "content/90-main.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "browser_action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "WhatsApp Web Advanced",
+    "default_icon": {
+      "48": "icons/icon.svg",
+      "96": "icons/icon.svg"
+    }
+  }
+}
