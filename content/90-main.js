@@ -10,86 +10,186 @@
   const S = WAP.sel;
   const UI = WAP.ui;
 
+  const FAIL_LIMIT = 12; // consecutive misses before the floating dock appears
+
+  const BUTTONS = [
+    {
+      id: "wap-privacy-btn",
+      icon: () => (WAP.privacy.isOn() ? UI.ICONS.eyeOff : UI.ICONS.eye),
+      title: "Privacy mode",
+      onClick: () => WAP.privacy.toggle(),
+    },
+    {
+      id: "wap-bulk-btn",
+      icon: () => UI.ICONS.bulk,
+      title: "Bulk sender (CSV)",
+      onClick: () => WAP.bulk.openModal(),
+    },
+    {
+      id: "wap-schedule-btn",
+      icon: () => UI.ICONS.clock,
+      title: "Schedule message",
+      onClick: () => WAP.schedule.openModal(),
+    },
+    {
+      id: "wap-nosave-btn",
+      icon: () => UI.ICONS.nosave,
+      title: "Message without saving",
+      onClick: () => WAP.nosave.openModal(),
+    },
+  ];
+
+  const IDS = BUTTONS.map((b) => b.id);
+  let failCount = 0;
+
   /* --------------------------- Button injection -------------------------- */
 
-  // WhatsApp wraps each toolbar icon in its own single-child <div>. If we
-  // insert into that wrapper, our buttons become children of a one-icon
-  // column and stack VERTICALLY. Climb from the matched element up to the
-  // node that actually sits in the horizontal icon row, so our buttons are
-  // inserted as its *siblings*.
-  function rowAnchorFor(el) {
-    let node = el;
-    while (
-      node.parentElement &&
-      node.parentElement.children.length === 1 &&
-      node.parentElement.tagName !== "HEADER" &&
-      node.parentElement.tagName !== "FOOTER"
-    ) {
-      node = node.parentElement;
+  function makeWrapper(btn) {
+    const wrapper = document.createElement("div");
+    wrapper.setAttribute("data-wap-wrapper", "1");
+    wrapper.style.cssText = [
+      "position:relative",
+      "top:auto",
+      "right:auto",
+      "bottom:auto",
+      "left:auto",
+      "flex:0 0 auto",
+      "display:inline-flex",
+      "align-items:center",
+      "justify-content:center",
+      "width:auto",
+      "height:auto",
+      "margin:0",
+      "padding:0",
+      "transform:none",
+    ].join(";");
+    wrapper.appendChild(btn);
+    return wrapper;
+  }
+
+  function ownWrappersIn(row) {
+    return Array.from(row.querySelectorAll(":scope > [data-wap-wrapper]"));
+  }
+
+  function groupIsIntact(row, after) {
+    const wrappers = ownWrappersIn(row);
+    if (wrappers.length !== BUTTONS.length) return false;
+    // Must sit directly after the anchor, in order.
+    let expected = after.nextElementSibling;
+    for (let i = 0; i < IDS.length; i++) {
+      if (!expected || expected !== wrappers[i]) return false;
+      if (!expected.querySelector("#" + IDS[i])) return false;
+      expected = expected.nextElementSibling;
     }
-    return node;
+    return true;
   }
 
   function ensureChatListButtons() {
-    const newChat = S.newChatButton();
-    if (!newChat) return;
-    const anchor = rowAnchorFor(newChat);
-    const container = anchor.parentElement;
-    if (!container) return;
+    const target = S.injectionTarget();
+    if (!target || !target.row || !target.after) return false;
 
-    // Privacy Button
-    const existingPrivacy = document.getElementById("wap-privacy-btn");
-    if (!existingPrivacy) {
-      const privacyBtn = UI.makeIconButton({
-        id: "wap-privacy-btn",
-        icon: WAP.privacy.isOn() ? UI.ICONS.eyeOff : UI.ICONS.eye,
-        title: "Privacy mode",
-        onClick: () => WAP.privacy.toggle(),
+    const { row, after } = target;
+    if (!row.contains(after)) return false;
+
+    if (groupIsIntact(row, after)) return true;
+
+    // Rebuild the whole group so ordering is never ambiguous.
+    ownWrappersIn(row).forEach((w) => w.remove());
+    document
+      .querySelectorAll("[data-wap-wrapper]")
+      .forEach((w) => {
+        if (w.id !== "wap-dock" && !row.contains(w)) w.remove();
       });
-      container.insertBefore(privacyBtn, anchor);
+
+    let ref = after;
+    BUTTONS.forEach((spec) => {
+      const btn = UI.makeIconButton({
+        id: spec.id,
+        icon: spec.icon(),
+        title: spec.title,
+        onClick: spec.onClick,
+      });
+      const wrapper = makeWrapper(btn);
+      row.insertBefore(wrapper, ref.nextSibling);
+      ref = wrapper;
+    });
+
+    try {
       WAP.privacy.apply(WAP.privacy.isOn());
-    } else if (existingPrivacy && existingPrivacy.isConnected) {
-      // Keep state sync updated if it already exists
-      WAP.privacy.apply(WAP.privacy.isOn());
+    } catch (e) {
+      WAP.warn("privacy sync", e);
     }
 
-    // Bulk Button
-    if (!document.getElementById("wap-bulk-btn")) {
-      const bulkBtn = UI.makeIconButton({
-        id: "wap-bulk-btn",
-        icon: UI.ICONS.bulk,
-        title: "Bulk sender (CSV)",
-        onClick: () => WAP.bulk.openModal(),
-      });
-      container.insertBefore(bulkBtn, anchor); // sibling in the row → horizontal
-    }
-
-    // Schedule Button
-    if (!document.getElementById("wap-schedule-btn")) {
-      const scheduleBtn = UI.makeIconButton({
-        id: "wap-schedule-btn",
-        icon: UI.ICONS.clock,
-        title: "Schedule message",
-        onClick: () => WAP.schedule.openModal(),
-      });
-      container.insertBefore(scheduleBtn, anchor); 
-    }
-
-    // No Save Button
-    if (!document.getElementById("wap-nosave-btn")) {
-      const nsBtn = UI.makeIconButton({
-        id: "wap-nosave-btn",
-        icon: UI.ICONS.nosave,
-        title: "Message without saving",
-        onClick: () => WAP.nosave.openModal(),
-      });
-      container.insertBefore(nsBtn, anchor);
-    }
+    WAP.log("buttons injected after", target.source, "in", row);
+    return true;
   }
 
+  /* --------------------------- Fallback dock ----------------------------- */
+
+  function removeDock() {
+    const d = document.getElementById("wap-dock");
+    if (d) d.remove();
+  }
+
+  function ensureDock() {
+    if (document.getElementById("wap-dock")) return;
+    const dock = document.createElement("div");
+    dock.id = "wap-dock";
+    dock.setAttribute("data-wap-wrapper", "1");
+    dock.style.cssText = [
+      "position:fixed",
+      "left:8px",
+      "bottom:96px",
+      "z-index:2147483400",
+      "display:flex",
+      "flex-direction:column",
+      "gap:2px",
+      "padding:4px",
+      "border-radius:24px",
+      "background:rgba(30,32,32,0.92)",
+      "color:#fafafa",
+      "box-shadow:0 4px 18px rgba(0,0,0,0.35)",
+    ].join(";");
+
+    BUTTONS.forEach((spec) => {
+      const btn = UI.makeIconButton({
+        id: spec.id,
+        icon: spec.icon(),
+        title: spec.title,
+        onClick: spec.onClick,
+      });
+      btn.style.color = "#fafafa";
+      dock.appendChild(btn);
+    });
+
+    document.body.appendChild(dock);
+    WAP.warn(
+      "wordmark anchor not found — using the floating dock. Run WAP.probe() and update content/10-selectors.js."
+    );
+    try {
+      WAP.privacy.apply(WAP.privacy.isOn());
+    } catch (e) {}
+  }
+
+  /* ------------------------------- Scheduling ---------------------------- */
+
   const ensureAll = WAP.debounce(() => {
-    try { ensureChatListButtons(); } catch (e) {}
-    try { ensurePrivacyButton(); } catch (e) {}
+    let ok = false;
+    try {
+      ok = ensureChatListButtons();
+    } catch (e) {
+      WAP.warn("inject", e);
+    }
+
+    if (ok) {
+      failCount = 0;
+      removeDock();
+    } else if (S.chatListPane()) {
+      // Only count a miss once the app has rendered, so the dock can't pop
+      // during the QR / loading screen.
+      failCount += 1;
+      if (failCount >= FAIL_LIMIT) ensureDock();
+    }
   }, 250);
 
   /* ------------------------------- Lifecycle ----------------------------- */
@@ -98,30 +198,43 @@
     WAP.log("init");
     await WAP.privacy.init();
 
-    // Keep buttons injected as WhatsApp re-renders.
-    const observer = new MutationObserver(ensureAll);
+    const observer = new MutationObserver((records) => {
+      const relevant = records.some((r) => {
+        const t = r.target;
+        if (t && t.nodeType !== 1) return true;
+        if (t && t.id && String(t.id).indexOf("wap-") === 0) return false;
+        if (
+          t &&
+          t.closest &&
+          t.closest("[data-wap-wrapper], .wap-modal-overlay, #wap-toast-host")
+        ) {
+          return false;
+        }
+        return true;
+      });
+      if (relevant) ensureAll();
+    });
     observer.observe(document.documentElement, { childList: true, subtree: true });
-    // Backup re-check + first run.
+
     ensureAll();
     setInterval(ensureAll, 2500);
 
-    // Resume any in-flight flows after a (re)load.
     setTimeout(() => {
       WAP.nosave.resume().catch((e) => WAP.warn("nosave resume", e));
       WAP.bulk.resume().catch((e) => WAP.warn("bulk resume", e));
     }, 1500);
 
-    // Scheduler poller.
-    setInterval(() => WAP.schedule.tick().catch((e) => WAP.warn("sched tick", e)), 10000);
+    setInterval(
+      () => WAP.schedule.tick().catch((e) => WAP.warn("sched tick", e)),
+      10000
+    );
 
-    // React to privacy changes made from the popup.
     WAP.api.storage.onChanged.addListener((changes, area) => {
       if (area === "local" && changes[WAP.KEYS.privacy]) {
         WAP.privacy.apply(!!changes[WAP.KEYS.privacy].newValue);
       }
     });
 
-    // Commands from the toolbar popup.
     WAP.api.runtime.onMessage.addListener((msg) => {
       if (!msg || !msg.type) return;
       if (msg.type === "WAP_OPEN") {
